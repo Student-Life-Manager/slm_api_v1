@@ -1,0 +1,55 @@
+version: 1
+disable_existing_loggers: False
+filters:
+  appFilter:
+    (): app.core.logging.requests.AppFilter
+
+formatters:
+  default:
+    format: "[%(asctime)s] %(request_id)s %(correlation_id)s %(levelname)-9s %(name)s:%(funcName)s -: %(message)s"
+
+  uvicorn-default:
+    (): "uvicorn.logging.DefaultFormatter"
+    fmt: "[%(asctime)s] %(request_id)s %(correlation_id)s %(levelprefix)-9s %(name)s:%(funcName)s -: %(message)s"
+
+  uvicorn-access:
+    (): "uvicorn.logging.AccessFormatter"
+    fmt: '[%(asctime)s] %(request_id)s %(correlation_id)s %(levelprefix)-9s %(name)s:%(funcName)s -: %(client_addr)s - "%(request_line)s" %(status_code)s'
+
+handlers:
+  default:
+    class: logging.StreamHandler
+    formatter: default
+    level: DEBUG
+    stream: ext://sys.stdout
+    filters: [appFilter]
+
+  uvicorn-default:
+    class: logging.StreamHandler
+    formatter: uvicorn-default
+    stream: ext://sys.stderr
+    filters: [appFilter]
+
+  uvicorn-access:
+    class: logging.StreamHandler
+    formatter: uvicorn-access
+    stream: ext://sys.stdout
+    filters: [appFilter]
+
+loggers:
+  urllib3:
+    level: INFO
+
+  uvicorn:
+    level: INFO
+    handlers:
+      - uvicorn-default
+
+  uvicorn.error:
+    level: INFO
+
+  uvicorn.access:
+    level: INFO
+    propagate: False
+    handlers:
+      - uvicorn-access

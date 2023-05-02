@@ -1,0 +1,207 @@
+from fastapi import APIRouter, Depends, Request
+
+from app.api.endpoints.dependencies.controllers import (
+    get_auth_user_controller,
+    get_outpass_controller,
+)
+from app.api.endpoints.dependencies.permissions import admin_required, auth_required
+from app.controllers import AuthUserController, OutpassController
+from app.core.exceptions import BadRequest
+from app.schema import (
+    AuthUserAccountType,
+    AuthUserHomeReturn,
+    AuthUserLogin,
+    AuthUserReturn,
+    AuthUserTokenReturn,
+    StudentCreate,
+    WardenCreate,
+)
+
+router = APIRouter(prefix="/auth_user")
+
+
+@router.post("/student/register", response_model=AuthUserReturn)
+def create_new_user(
+    auth_user_create: StudentCreate,
+    auth_user_controller: AuthUserController = Depends(get_auth_user_controller),
+):
+    """
+    Create new users
+    """
+    existing_auth_user = auth_user_controller.get_by_email(auth_user_create.email)
+
+    if existing_auth_user:
+        raise BadRequest(message="Auth user already exists with this email.")
+
+    auth_user = auth_user_controller.register(
+        auth_user_create, AuthUserAccountType.STUDENT
+    )
+
+    return auth_user
+
+
+@router.post("/warden/register")
+@auth_required
+@admin_required
+def create_new_warden(
+    request: Request,
+    auth_user_create: WardenCreate,
+    auth_user_controller: AuthUserController = Depends(get_auth_user_controller),
+):
+    """
+    Create new users
+    """
+    auth_user = auth_user_controller.register(
+        auth_user_create, AuthUserAccountType.WARDEN
+    )
+
+    return auth_user
+
+
+@router.post("/login", response_model=AuthUserTokenReturn)
+def login(
+    auth_user_login: AuthUserLogin,
+    auth_user_controller: AuthUserController = Depends(get_auth_user_controller),
+):
+    """
+    Logins new user
+    """
+
+    jwt_token = auth_user_controller.login(
+        email=auth_user_login.email, password=auth_user_login.password
+    )
+
+    return jwt_token
+
+
+@router.get("/home", response_model=AuthUserHomeReturn)
+@auth_required
+def get_student_home(
+    request: Request,
+    auth_user_controller: AuthUserController = Depends(get_auth_user_controller),
+    outpass_controller: OutpassController = Depends(get_outpass_controller),
+):
+    auth_user = request.state.auth_user
+
+    outpasses = outpass_controller.get_student_outpasses(auth_user.id)
+
+    return AuthUserHomeReturn(auth_user=auth_user, outpass=outpasses)
+
+
+@router.get("/students", response_model=list[AuthUserReturn])
+@admin_required
+def get_all_students(
+    request: Request,
+    auth_user_controller: AuthUserController = Depends(get_auth_user_controller),
+):
+    """
+    Returns all auth_users with role as student
+    """
+    students = auth_user_controller.get_students()
+
+    return students
+
+
+@router.get("/wardens")
+@auth_required
+@admin_required
+def get_all_wardens(
+    auth_user_controller: AuthUserController = Depends(get_auth_user_controller),
+):
+    """
+    Returns all auth_users with role as wardens
+    """
+
+    wardens = auth_user_controller.get_wardens()
+
+    return wardens
+
+
+@router.get("/hostel/wardens")
+@auth_required
+def get_all_wardens_by_hostel_type(
+    request: Request,
+    hostel_type: str,
+    auth_user_controller: AuthUserController = Depends(get_auth_user_controller),
+):
+    """
+    Returns all auth_users with role as wardens
+    """
+
+    wardens = auth_user_controller.get_wardens_by_hostel_type(hostel_type)
+
+    return wardens
+
+
+@router.patch("/me/password")
+@auth_required
+def update_profile_details(
+    request: Request,
+    password: str,
+    auth_user_controller: AuthUserController = Depends(get_auth_user_controller),
+):
+    """
+    Adds profile details for auth users (can be used in both onboarding and edit profile pages)
+    """
+
+    auth_user = auth_user_controller.get(request.state.auth_user_id)
+
+    if auth_user_controller.update_password(auth_user=auth_user, password=password):
+        return True
+
+    return False
+
+
+@router.get("/me", response_model=AuthUserReturn)
+@auth_required
+def get_profile_details(
+    request: Request,
+    auth_user_controller: AuthUserController = Depends(get_auth_user_controller),
+):
+    """
+    Returns all details of an auth_user
+    """
+
+    auth_user = auth_user_controller.get(request.state.auth_user_id)
+
+    return auth_user
+
+
+@router.patch("/profile_checklist", response_model=AuthUserReturn)
+@auth_required
+def get_profile_checklist(
+    request: Request,
+    auth_user_controller: AuthUserController = Depends(get_auth_user_controller),
+):
+    """
+    Returns the checklist for profile completion for different types of auth_users
+    """
+
+    auth_user = auth_user_controller.get(request.state.auth_user_id)
+
+    return auth_user_controller.update_auth_user_onboarding(auth_user=auth_user)
+
+
+@router.delete("/logout")
+def logout():
+    """
+    Logsout the auth user (removes the auth_token)
+    """
+    return {}
+
+
+# ADMIN SPECIFIC ROUTES
+@router.delete("/delete")
+def delete_auth_user(role, auth_user_uuid):
+    """
+    Deletes auth user (removes the auth_token)
+    """
+    return {}
+
+
+@router.post("/")
+def crete_auth_user(role, email):
+    """
+    Creates auth user using email
+    """
+    return {}

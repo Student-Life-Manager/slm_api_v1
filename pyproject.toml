@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "slm-api"
+version = "0.1.0"
+description = ""
+authors = ["Prathyusha Guduru <prathyushaguduru28@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10.6"
+fastapi = "0.75.0"
+uvicorn = {extras = ["standard"], version = "^0.16.0"}
+pydantic = {extras = ["email"], version = "^1.9.0"}
+psycopg2 = "^2.9.3"
+PyYAML = "^6.0"
+SQLAlchemy = "^1.4.29"
+python-jose = "^3.3.0"
+alembic = "^1.7.5"
+gunicorn = "^20.1.0"
+sentry-sdk = "^1.16.0"
+httpx = "^0.23.0"
+Babel = "^2.10.1"
+isodate = "^0.6.1"
+python-multipart = "^0.0.5"
+pyrate-limiter = "^2.8.1"
+passlib = "^1.7.4"
+requests = "^2.28.1"
+black = "^23.3.0"
+isort = "^5.12.0"
+pylint = "^2.17.2"
+fastapi-permissions = "^0.2.7"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+indent-string='  '

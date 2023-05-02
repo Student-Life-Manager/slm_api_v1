@@ -1,0 +1,13 @@
+version: "3.4"
+
+services:
+  postgresql:
+    image: postgres:14.2-alpine
+    environment:
+      POSTGRES_USER: slm_user
+      POSTGRES_PASSWORD: slm
+      POSTGRES_DB: slm-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
