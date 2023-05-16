@@ -2,7 +2,6 @@ from uuid import UUID
 
 from sqlalchemy.orm import Query, joinedload
 
-from app.core.exceptions import BadRequest
 from app.models.guardian import Guardian
 
 from .base import CRUDBase

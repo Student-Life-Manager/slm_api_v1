@@ -7,11 +7,12 @@ from app.core.exceptions import Unauthorized
 
 ALGORITHM = settings.AUTH_CONFIG.JWT_ALGORITHM
 SECRET_KEY = settings.AUTH_CONFIG.JWT_SECRET_KEY
+EXPIRY_TIME_IN_DAYS = settings.AUTH_CONFIG.JWT_EXPIRY_TIME_IN_DAYS
 
 
 class JWTHandler:
     @staticmethod
-    def encode(payload: dict, days: int = 1) -> str:
+    def encode(payload: dict, days: int = EXPIRY_TIME_IN_DAYS) -> str:
         expire = datetime.utcnow() + timedelta(days=days)
         payload.update({"exp": expire})
         return jwt.encode(payload, SECRET_KEY, ALGORITHM)
@@ -33,6 +34,3 @@ class JWTHandler:
             )
         except JWTError as exception:
             print(exception, flush=True)
-
-
-# - go to this doc, do this

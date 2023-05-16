@@ -7,7 +7,6 @@ from .base import CRUDBase
 
 
 class CRUDAuthUser(CRUDBase[AuthUser]):
-    # THESE ARE FOR QUERIES
     def get_by_email(self, email: str, with_: list | None = None) -> AuthUser:
         query = self._queryable(with_)
         query = query.filter(AuthUser.email == email)

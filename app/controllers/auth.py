@@ -1,5 +1,6 @@
 from pydantic import EmailStr
 
+from app.core.config import settings
 from app.core.exceptions import BadRequest, Unauthorized
 from app.core.jwt import JWTHandler
 from app.core.password import PasswordHandler
@@ -7,13 +8,13 @@ from app.crud import CRUDAuthUser
 from app.models import AuthUser
 from app.schema.auth_user import (
     AuthUserAccountType,
+    AuthUserCreate,
     AuthUserHostelDetails,
-    AuthUserReturn,
+    AuthUserRegisterReturn,
     AuthUserTokenReturn,
     AuthUserUpdate,
     StudentAcademicDetails,
     StudentChecklist,
-    StudentCreate,
     WardenChecklist,
 )
 
@@ -31,8 +32,8 @@ class AuthUserController(
         self.crud_auth_user = crud_auth_user
 
     def register(
-        self, create_auth_user: StudentCreate, user_type: AuthUserAccountType
-    ) -> AuthUserReturn:
+        self, create_auth_user: AuthUserCreate, user_type: AuthUserAccountType
+    ) -> AuthUserRegisterReturn:
         auth_user = self.crud_auth_user.get_by_email(create_auth_user.email)
         if auth_user:
             raise BadRequest("auth user already exists")
@@ -48,9 +49,22 @@ class AuthUserController(
 
         elif user_type == AuthUserAccountType.WARDEN:
             attributes["checklist"] = WardenChecklist().__dict__
+            attributes["academic_details"] = None
 
         new_user = self.crud_auth_user.create(attributes)
-        return new_user
+        authorization_token = {
+            "access_token": JWTHandler.encode({"auth_user_id": new_user.id}),
+            "refresh_token": JWTHandler.encode(
+                {"auth_user_id": new_user.id, "sub": "refresh_token"},
+                settings.AUTH_CONFIG.JWT_REFRESH_TOKEN_EXPIRY_IN_DAYS,
+            ),
+        }
+        student_user_register = AuthUserRegisterReturn(
+            email=new_user.email,
+            access_token=authorization_token["access_token"],
+            refresh_token=authorization_token["refresh_token"],
+        )
+        return student_user_register
 
     def login(self, email: str, password: str):
         auth_user = self.crud_auth_user.get_by_email(email)
@@ -62,7 +76,8 @@ class AuthUserController(
         return {
             "access_token": JWTHandler.encode({"auth_user_id": auth_user.id}),
             "refresh_token": JWTHandler.encode(
-                {"auth_user_id": auth_user.id, "sub": "refresh_token"}, 5
+                {"auth_user_id": auth_user.id, "sub": "refresh_token"},
+                settings.AUTH_CONFIG.JWT_REFRESH_TOKEN_EXPIRY_IN_DAYS,
             ),
         }
 
@@ -89,7 +104,8 @@ class AuthUserController(
         return {
             "access_token": JWTHandler.encode({"auth_user_id": auth_user_id}),
             "refresh_token": JWTHandler.encode(
-                {"auth_user_id": auth_user_id, "sub": "refresh_token"}, 5
+                {"auth_user_id": auth_user_id, "sub": "refresh_token"},
+                settings.AUTH_CONFIG.JWT_REFRESH_TOKEN_EXPIRY_IN_DAYS,
             ),
         }
 
@@ -103,7 +119,6 @@ class AuthUserController(
 
     def update_auth_user_onboarding(self, auth_user: AuthUser) -> None:
         checklist_db = auth_user.checklist
-        allowed_step = None
 
         for key in checklist_db:
             if not checklist_db[key]:
@@ -113,7 +128,10 @@ class AuthUserController(
             if checklist_db[key]:
                 continue
 
-        valid_steps = self._checklist_step_validity(auth_user)
+        if auth_user.account_type == AuthUserAccountType.STUDENT:
+            valid_steps = self._checklist_step_validity_for_student(auth_user)
+        elif auth_user.account_type == AuthUserAccountType.WARDEN:
+            valid_steps = self._checklist_step_validity_for_warden(auth_user)
 
         for valid_step in valid_steps:
             checklist_db[valid_step] = True
@@ -134,11 +152,6 @@ class AuthUserController(
     def get_wardens_by_hostel_type(self, hostel_type: str) -> list[AuthUser]:
         return self.crud_auth_user.get_wardens_by_hostel_type(hostel_type=hostel_type)
 
-    # def give_user_name(self, id: int) -> str:
-    # def is a keyword
-    # give_user_name is function name
-    # (self is same as this, <parameter-one>: <parameter-type>) -> function_return_type
-
     def _check_refresh_token_validity(
         self, access_token: str, refresh_token: str
     ) -> int:
@@ -153,7 +166,7 @@ class AuthUserController(
 
         return payload["auth_user_id"]
 
-    def _checklist_step_validity(self, auth_user: AuthUser) -> list[str]:
+    def _checklist_step_validity_for_student(self, auth_user: AuthUser) -> list[str]:
         valid_steps = []
         if all(
             [
@@ -187,5 +200,46 @@ class AuthUserController(
             ]
         ):
             valid_steps.append("academic_details")
+
+        return valid_steps
+
+    def _check_refresh_token_validity(
+        self, access_token: str, refresh_token: str
+    ) -> int:
+        refresh_payload = JWTHandler.decode(refresh_token)
+        payload = JWTHandler.decode_expire(access_token)
+
+        if "sub" in refresh_payload and refresh_payload["sub"] != "refresh_token":
+            raise BadRequest("Invalid refresh token.")
+
+        if payload["auth_user_id"] != refresh_payload["auth_user_id"]:
+            raise BadRequest("Access token and refresh token does not match.")
+
+        return payload["auth_user_id"]
+
+    def _checklist_step_validity_for_warden(self, auth_user: AuthUser) -> list[str]:
+        valid_steps = []
+        if all(
+            [
+                auth_user.first_name,
+                auth_user.last_name,
+                auth_user.roll_number,
+                auth_user.phone_number,
+                auth_user.email,
+            ]
+        ):
+            valid_steps.append("personal_details")
+
+        if all(
+            [
+                auth_user.hostel_details["hostel_type"]
+                if hasattr(auth_user, "hostel_details")
+                else False,
+                auth_user.hostel_details["bldg_name"]
+                if hasattr(auth_user, "hostel_details")
+                else False,
+            ]
+        ):
+            valid_steps.append("hostel_details")
 
         return valid_steps

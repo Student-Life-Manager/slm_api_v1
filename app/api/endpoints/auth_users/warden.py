@@ -3,17 +3,22 @@ from fastapi import APIRouter, Depends, Request
 from app.api.endpoints.dependencies.controllers import get_auth_user_controller
 from app.api.endpoints.dependencies.permissions import admin_required, auth_required
 from app.controllers import AuthUserController
-from app.schema import AuthUserAccountType, AuthUserReturn, WardenCreate
+from app.schema import (
+    AuthUserAccountType,
+    AuthUserCreate,
+    AuthUserRegisterReturn,
+    AuthUserReturn,
+)
 
-router = APIRouter(prefix="/warden")
+router = APIRouter(prefix="/wardens")
 
 
-@router.post("/warden/register", response_model=AuthUserReturn)
+@router.post("/register", response_model=AuthUserRegisterReturn)
 @auth_required
 @admin_required
 def create_new_warden(
     request: Request,
-    auth_user_create: WardenCreate,
+    auth_user_create: AuthUserCreate,
     auth_user_controller: AuthUserController = Depends(get_auth_user_controller),
 ):
     """

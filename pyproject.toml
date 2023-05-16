@@ -29,9 +29,9 @@ isort = "^5.12.0"
 pylint = "^2.17.2"
 fastapi-permissions = "^0.2.7"
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
 [tool.black]
 indent-string='  '
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

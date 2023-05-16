@@ -1,15 +1,16 @@
 from .auth_user import (
     AuthUserAccountType,
     AuthUserAuthRefresh,
+    AuthUserCreate,
     AuthUserHomeReturn,
     AuthUserLogin,
     AuthUserPasswordUpdate,
+    AuthUserRegisterReturn,
     AuthUserReturn,
     AuthUserTokenReturn,
     AuthUserUpdate,
     StudentAcademicDetails,
     StudentCreate,
-    StudentRegisterReturn,
     WardenChecklist,
     WardenCreate,
 )

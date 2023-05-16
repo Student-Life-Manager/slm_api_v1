@@ -7,9 +7,11 @@ class SLMBaseConfig(BaseSettings):
 
 
 class AuthConfig(SLMBaseConfig):
-    JWT_SECRET_KEY: str
+    JWT_SECRET_KEY: str = ""
     JWT_ALGORITHM: str = "HS256"
-    JWT_EXPIRE_MINUTES: int
+    JWT_EXPIRY_TIME_IN_DAYS: int = 1
+    JWT_ACCESS_TOKEN_EXPIRY_IN_DAYS: int = 1
+    JWT_REFRESH_TOKEN_EXPIRY_IN_DAYS: int = 5
 
 
 class SentryConfig(SLMBaseConfig):
@@ -30,6 +32,7 @@ class Settings(SLMBaseConfig):
     DEBUG: int = 0
     ENVIRONMENT: str = "development"
     POSTGRES_URL: PostgresDsn = "postgresql://slm_user:slm@127.0.0.1:5432/slm-db"
+    DATABASE_URL: PostgresDsn = "postgresql://slm_user:slm@127.0.0.1:5432/slm-db"
     RELEASE_VERSION: str = "dev"
     SHOW_SQL_ALCHEMY_QUERIES: int = 1
     SHOW_OUTGOING_REQUESTS: int = 1

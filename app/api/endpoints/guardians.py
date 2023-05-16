@@ -12,7 +12,7 @@ from app.controllers import AuthUserController, GuardianController
 from app.core.exceptions import NotFound
 from app.schema import GuardianCreate, GuardianReturn
 
-router = APIRouter(prefix="/guardian")
+router = APIRouter(prefix="/guardians")
 
 
 @router.get("/")

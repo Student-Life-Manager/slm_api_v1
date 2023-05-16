@@ -1,7 +1,8 @@
 from uuid import UUID
 
-from app.core.exceptions import BadRequest, NotFound
+from app.core.exceptions import BadRequest, Forbidden, NotFound
 from app.crud.guardian import CRUDGuardian
+from app.crud.outpass import CRUDOutpass
 from app.models import Guardian
 from app.schema.guardian import GuardianCreate, GuardianReturn, GuardianUpdate
 
@@ -9,9 +10,10 @@ from .base import BaseController
 
 
 class GuardianController(BaseController[Guardian, GuardianUpdate]):
-    def __init__(self, db, crud_guardian: CRUDGuardian):
+    def __init__(self, db, crud_guardian: CRUDGuardian, crud_outpass: CRUDOutpass):
         super().__init__(model=Guardian, db=db, crud_instance=crud_guardian)
         self.crud_guardian = crud_guardian
+        self.crud_outpass = crud_outpass
 
     def create(
         self,
@@ -57,10 +59,14 @@ class GuardianController(BaseController[Guardian, GuardianUpdate]):
         )
 
     def delete(self, student_id: int, guardian_uuid: UUID) -> bool:
+        active_outpass = self.crud_outpass.get_active_outpass_by_student_id(student_id)
+
+        if active_outpass:
+            raise Forbidden("Cannot delete guardians while an outpass is active")
+
         guardian = self.crud_guardian.get_guardian_with_uuid_and_student_id(
             student_id=student_id, uuid=guardian_uuid
         )
-
         if not guardian:
             raise NotFound("Guardian not found")
 

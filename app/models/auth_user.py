@@ -51,32 +51,3 @@ class AuthUser(Base):
         Index("idx__auth_user_last_name", last_name),
         Index("idx__auth_user_email", email),
     )
-
-    @property
-    def is_profile_complete(self):
-        base_checks = [
-            self.first_name,
-            self.last_name,
-            self.roll_number,
-            self.phone_number,
-        ]
-        if self.account_type == "student":
-            return all(
-                base_checks
-                + [
-                    self.checklist,
-                    self.checklist.get("personal_details")
-                    and self.checklist.get("hostel_details")
-                    and self.checklist.get("academic_details"),
-                ],
-            )
-
-        if self.account_type == "warden":
-            return all(
-                base_checks
-                + [
-                    self.checklist
-                    and self.checklist.get("personal_details")
-                    and self.checklist.get("hostel_details"),
-                ]
-            )

@@ -1,3 +1,4 @@
+import datetime
 from uuid import uuid4
 
 from sqlalchemy import (
@@ -9,12 +10,14 @@ from sqlalchemy import (
     Index,
     String,
     Time,
+    func,
 )
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import relationship
 
 from app.database.setup import Base
+from app.schema.outpass import OutpassStatus
 
 
 class Outpass(Base):
@@ -28,13 +31,10 @@ class Outpass(Base):
     reason = Column(String, nullable=False)
     alternate_phone_number = Column(String)
     status = Column(String, nullable=False)
-    # possible statuses = [in_campus,exited_campus,returned_to_campus,late_return]
-    # TODO : ADD THESE COLUMNS
     approved_at = Column(DateTime)
     exited_at = Column(DateTime)
     returned_at = Column(DateTime)
     warden_message = Column(String)
-    # for first level and second level permissions
     approval = Column(MutableDict.as_mutable(JSONB), nullable=False)
 
     # Relationships with auth user table
@@ -47,9 +47,23 @@ class Outpass(Base):
         uselist=False,
     )
     guardian_id = Column(BigInteger, ForeignKey("guardian.id"), nullable=False)
+    guardian = relationship("Guardian", foreign_keys=[guardian_id], uselist=False)
+
+    created_at = Column(DateTime(timezone=True), nullable=False, default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=datetime.datetime.utcnow)
 
     __table_args__ = (
         Index("idx__outpass_uuid", uuid),
         Index("idx__outpass_out_date", out_date),
         Index("idx__outpass_status", status),
     )
+
+    @property
+    def is_active(self):
+        if self.status in [
+            OutpassStatus.CREATED,
+            OutpassStatus.IN_CAMPUS,
+            OutpassStatus.EXITED_CAMPUS,
+        ]:
+            return True
+        return False

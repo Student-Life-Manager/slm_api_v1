@@ -7,16 +7,9 @@ from app.core.config import settings
 
 from .generic import GenericReturn
 from .guardian import GuardianReturn
-from .outpass import OutpassReturn
 
 phone_number = "123456"
 MAX_NUMBER_OF_USERS = 123
-
-# primitive types: int, str, float. boolean
-# boolean: True or False
-# str: "1", "A", "B", "C"
-
-# AuthUserAccountType: "student", "warden", "admin"
 
 
 class AuthUserAccountType(str, Enum):
@@ -46,12 +39,11 @@ class AuthUserHostelDetails(BaseModel):
 class StudentCreate(BaseModel):
     email: EmailStr
     password: str
-    phone_number: str
 
     @validator("email")
     def validate_email_domain(cls, email):
         if not email.endswith(settings.ALLOWED_EMAIL_DOMAIN):
-            raise ValueError("Invalid email.")
+            raise ValueError("Only srmap emails are allowed to register")
 
         return email
 
@@ -63,6 +55,11 @@ class WardenCreate(BaseModel):
     password: str
     phone_number: str
     hostel_details: AuthUserHostelDetails
+
+
+class AuthUserCreate(BaseModel):
+    email: EmailStr
+    password: str
 
 
 class AuthUserLogin(BaseModel):
@@ -104,9 +101,10 @@ class AuthUserPasswordUpdate(BaseModel):
     password: str
 
 
-class StudentRegisterReturn(BaseModel):
+class AuthUserRegisterReturn(BaseModel):
     email: str
-    phone_number: str
+    access_token: str
+    refresh_token: str
 
     class Config:
         orm_mode = True
@@ -131,6 +129,7 @@ class AuthUserReturn(AuthUserBasicReturn):
     phone_number: str
     hostel_details: AuthUserHostelDetails
     academic_details: StudentAcademicDetails
+    checklist: StudentChecklist | WardenChecklist
 
     class Config:
         orm_mode = True
@@ -142,4 +141,4 @@ class AuthUserWithGuardiansReturn(AuthUserReturn):
 
 class AuthUserHomeReturn(BaseModel):
     auth_user: AuthUserBasicReturn
-    outpass: list[OutpassReturn]
+    outpass: list[object]

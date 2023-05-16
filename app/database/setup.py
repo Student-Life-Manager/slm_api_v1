@@ -4,10 +4,9 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
 
 
-# this is a base model
 @as_declarative()
 class Base:
-    id: Any  # id can be str too,
+    id: Any
     uuid: UUID
     __name__: str
 

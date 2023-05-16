@@ -1,19 +1,21 @@
 from datetime import date, datetime, time
 from enum import Enum
-from typing import ClassVar
 from uuid import UUID
 
-from pydantic import AnyHttpUrl, BaseModel
+from pydantic import BaseModel
 
+from .auth_user import AuthUserReturn
 from .generic import GenericReturn
+from .guardian import GuardianReturn
 
 
 class OutpassStatus(str, Enum):
     CREATED = "created"
-    CONFIRMED = "confirmed"
-    LIVE = "live"
-    LATE = "late"
-    CANCELLED = "cancelled"
+    REJECTED = "rejected"
+    IN_CAMPUS = "in_campus"
+    EXITED_CAMPUS = "exited_campus"
+    RETURNED_TO_CAMPUS = "returned_to_campus"
+    LATE_RETURN = "late_return"
 
 
 class OutpassCreate(BaseModel):
@@ -48,6 +50,14 @@ class OutpassReturn(GenericReturn):
     returned_at: datetime | None
     warden_message: str | None
     approval: dict
+
+    class Config:
+        orm_mode = True
+
+
+class OutpassWithGuardianAndWardenReturn(OutpassReturn):
+    warden: AuthUserReturn
+    guardian: GuardianReturn
 
 
 class OutpassApproval(BaseModel):

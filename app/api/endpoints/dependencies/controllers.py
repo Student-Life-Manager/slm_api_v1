@@ -23,9 +23,13 @@ def get_guardian_controller(db: Session = Depends(get_db)):
     """
     dependency controller for loading GuardianController
     """
+    crud_outpass = CRUDOutpass(db=db, model=Outpass)
+
     crud_guardian = CRUDGuardian(db=db, model=Guardian)
 
-    return GuardianController(db=db, crud_guardian=crud_guardian)
+    return GuardianController(
+        db=db, crud_guardian=crud_guardian, crud_outpass=crud_outpass
+    )
 
 
 def get_outpass_controller(db: Session = Depends(get_db)):

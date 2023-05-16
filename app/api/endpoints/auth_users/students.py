@@ -9,19 +9,19 @@ from app.controllers import AuthUserController, OutpassController
 from app.core.exceptions import BadRequest
 from app.schema import (
     AuthUserAccountType,
+    AuthUserCreate,
     AuthUserHomeReturn,
+    AuthUserRegisterReturn,
     AuthUserReturn,
     AuthUserUpdate,
-    StudentCreate,
-    StudentRegisterReturn,
 )
 
 router = APIRouter(prefix="/students")
 
 
-@router.post("/register", response_model=StudentRegisterReturn)
+@router.post("/register", response_model=AuthUserRegisterReturn)
 def create_new_user(
-    auth_user_create: StudentCreate,
+    auth_user_create: AuthUserCreate,
     auth_user_controller: AuthUserController = Depends(get_auth_user_controller),
 ):
     """
@@ -78,6 +78,21 @@ def update_my_profile(
     updated_auth_user = auth_user_controller.update_profile(auth_user, auth_user_update)
 
     return updated_auth_user
+
+
+@router.get("/me", response_model=AuthUserReturn)
+@auth_required
+def get_profile_details(
+    request: Request,
+    auth_user_controller: AuthUserController = Depends(get_auth_user_controller),
+):
+    """
+    Returns all details of an auth_user
+    """
+
+    auth_user = auth_user_controller.get(request.state.auth_user_id)
+
+    return auth_user
 
 
 @router.patch("/me", response_model=AuthUserReturn)

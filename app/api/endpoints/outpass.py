@@ -6,28 +6,29 @@ from app.api.endpoints.dependencies import (
     admin_required,
     auth_required,
     get_auth_user_controller,
+    get_guardian_controller,
     get_outpass_controller,
     student_route,
     warden_route,
-    get_guardian_controller
 )
-from app.controllers import AuthUserController, OutpassController, GuardianController
+from app.controllers import AuthUserController, GuardianController, OutpassController
 from app.core.exceptions import BadRequest, NotFound
 from app.schema import AuthUserAccountType, OutpassCreate, OutpassReturn
+from app.schema.outpass import OutpassStatus
 
-router = APIRouter(prefix="/outpass")
+router = APIRouter(prefix="/outpasses")
 
 
-@router.post("/")
+@router.post("/", response_model=OutpassReturn)
 @student_route
 def create_outpass(
     request: Request,
-    warden_uuid : UUID,
+    warden_uuid: UUID,
     guardian_uuid: UUID,
     outpass_create: OutpassCreate,
     auth_user_controller: AuthUserController = Depends(get_auth_user_controller),
     outpass_controller: OutpassController = Depends(get_outpass_controller),
-    guardian_controller : GuardianController = Depends(get_guardian_controller)
+    guardian_controller: GuardianController = Depends(get_guardian_controller),
 ):
     """
     Returns all the outpasses of an auth user (students and wardens)
@@ -40,15 +41,18 @@ def create_outpass(
     guardian = guardian_controller.get_by_uuid(guardian_uuid)
     if not guardian:
         raise NotFound("Guardian does not exist")
-    
+
     outpass = outpass_controller.create(
-        auth_user=auth_user, warden_id=warden.id, guardian_id=guardian.id, outpass_create=outpass_create
+        auth_user=auth_user,
+        warden_id=warden.id,
+        guardian_id=guardian.id,
+        outpass_create=outpass_create,
     )
 
     return outpass
 
 
-@router.get("/")
+@router.get("/", response_model=list[OutpassReturn])
 @admin_required
 def get_new_outpass(
     request: Request,
@@ -133,9 +137,10 @@ def get_outpass_details(
 
     return outpass
 
+
 @router.patch("/{outpass_uuid}", response_model=OutpassReturn)
 @auth_required
-def get_outpass_details(
+def update_outpass(
     outpass_uuid: UUID,
     request: Request,
     outpass_controller: OutpassController = Depends(get_outpass_controller),
@@ -150,3 +155,20 @@ def get_outpass_details(
     )
 
     return outpass
+
+
+@router.patch("/{outpass_uuid}/status", response_model=OutpassReturn)
+@warden_route
+def update_outpass_status(
+    outpass_uuid: UUID,
+    status: OutpassStatus,
+    request: Request,
+    outpass_controller: OutpassController = Depends(get_outpass_controller),
+):
+    """
+    Update outpass status
+    """
+
+    outpass = outpass_controller.get_by_uuid(outpass_uuid)
+
+    return outpass_controller.update_outpass_status(outpass, status)
