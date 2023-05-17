@@ -1,6 +1,6 @@
 CREATE TABLE
     auth_user(
-        id INTEGER PRIMARY KEY NOT NULL,
+        id SERIAL PRIMARY KEY NOT NULL,
         uuid UUID NOT NULL,
         email VARCHAR,
         password VARCHAR,
@@ -22,7 +22,7 @@ CREATE TABLE
 
 CREATE TABLE
     guardian(
-        id INTEGER PRIMARY KEY NOT NULL,
+        id SERIAL PRIMARY KEY NOT NULL,
         uuid UUID NOT NULL,
         relation VARCHAR NOT NULL,
         phone_number VARCHAR NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE
 
 CREATE TABLE
     outpass(
-        id INTEGER PRIMARY KEY NOT NULL,
+        id SERIAL PRIMARY KEY NOT NULL,
         uuid UUID NOT NULL,
         out_date DATE NOT NULL,
         out_time TIME NOT NULL,
