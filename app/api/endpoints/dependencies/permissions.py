@@ -34,7 +34,6 @@ def auth_required(func):
         if not token:
             raise Unauthorized(message="Missing bearer token.")
 
-        token = request.headers["Authorization"]
         user_id = validate_token(token.split(" ")[1])
 
         request.state.auth_user_id = user_id
