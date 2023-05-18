@@ -27,6 +27,8 @@ def auth_required(func):
             token = request.headers["Authorization"]
         elif "Auth" in request.headers:
             token = request.headers["Auth"]
+        elif "X-Authorization" in request.headers:
+            token = request.headers["X-Authorization"]
 
         
         if not token:
