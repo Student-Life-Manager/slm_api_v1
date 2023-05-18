@@ -23,7 +23,13 @@ def auth_required(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         request: Request = kwargs["request"]
-        if "Authorization" not in request.headers:
+        if "Authorization" in request.headers:
+            token = request.headers["Authorization"]
+        elif "Auth" in request.headers:
+            token = request.headers["Auth"]
+
+        
+        if not token:
             raise Unauthorized(message="Missing bearer token.")
 
         token = request.headers["Authorization"]
