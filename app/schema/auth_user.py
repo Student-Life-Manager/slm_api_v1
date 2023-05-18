@@ -112,9 +112,9 @@ class AuthUserRegisterReturn(BaseModel):
 
 class AuthUserBasicReturn(GenericReturn):
     uuid: UUID
-    first_name: str
-    last_name: str
-    roll_number: str
+    first_name: str | None = None
+    last_name: str | None = None
+    roll_number: str | None = None
     email: str
 
     class Config:
@@ -123,12 +123,9 @@ class AuthUserBasicReturn(GenericReturn):
 
 class AuthUserReturn(AuthUserBasicReturn):
     account_type: AuthUserAccountType
-    phone_number: str
-    roll_number: str
-    email: EmailStr
-    phone_number: str
-    hostel_details: AuthUserHostelDetails
-    academic_details: StudentAcademicDetails
+    phone_number: str | None = None
+    hostel_details: AuthUserHostelDetails 
+    academic_details: StudentAcademicDetails 
     checklist: StudentChecklist | WardenChecklist
 
     class Config:
