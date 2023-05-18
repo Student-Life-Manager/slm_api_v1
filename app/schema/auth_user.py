@@ -125,7 +125,7 @@ class AuthUserReturn(AuthUserBasicReturn):
     account_type: AuthUserAccountType
     phone_number: str | None = None
     hostel_details: AuthUserHostelDetails 
-    academic_details: StudentAcademicDetails 
+    academic_details: StudentAcademicDetails | None = None
     checklist: StudentChecklist | WardenChecklist
 
     class Config:
