@@ -33,7 +33,6 @@ def create_new_warden(
 
 @router.get("/", response_model=list[AuthUserReturn])
 @auth_required
-@admin_required
 def get_all_wardens(
     request: Request,
     auth_user_controller: AuthUserController = Depends(get_auth_user_controller),
