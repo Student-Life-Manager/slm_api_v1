@@ -172,3 +172,18 @@ def update_outpass_status(
     outpass = outpass_controller.get_by_uuid(outpass_uuid)
 
     return outpass_controller.update_outpass_status(outpass, status)
+
+
+@router.delete("/{outpass_uuid}")
+@auth_required
+def cancel_outpass(
+    request: Request,
+    outpass_uuid: UUID,
+    outpass_controller: OutpassController = Depends(get_outpass_controller),
+):
+    """
+    Cancel an existing outpass
+    """
+
+    outpass = outpass_controller.get_by_uuid(outpass_uuid)
+    return outpass_controller.delete(outpass_uuid=outpass_uuid)

@@ -25,7 +25,7 @@ class Outpass(Base):
     id = Column(BigInteger, primary_key=True, autoincrement=True)
     uuid = Column(UUID(as_uuid=True), default=uuid4, nullable=False)
     out_date = Column(Date, nullable=False)
-    out_time = Column(Time, nullable=False)
+    out_time = Column(Time)
     expected_return_at = Column(Date, nullable=False)
     location = Column(String, nullable=False)
     reason = Column(String, nullable=False)

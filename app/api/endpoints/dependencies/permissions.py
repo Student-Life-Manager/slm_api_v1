@@ -30,7 +30,6 @@ def auth_required(func):
         elif "X-Authorization" in request.headers:
             token = request.headers["X-Authorization"]
 
-        
         if not token:
             raise Unauthorized(message="Missing bearer token.")
 

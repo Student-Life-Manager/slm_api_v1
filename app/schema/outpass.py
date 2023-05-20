@@ -20,7 +20,7 @@ class OutpassStatus(str, Enum):
 
 class OutpassCreate(BaseModel):
     out_date: date
-    out_time: time
+    out_time: time | None = None
     expected_return_at: date
     location: str
     reason: str
@@ -39,7 +39,7 @@ class OutpassUpdate(BaseModel):
 class OutpassReturn(GenericReturn):
     uuid: UUID
     out_date: date
-    out_time: time
+    out_time: time | None = None
     expected_return_at: date
     location: str
     reason: str

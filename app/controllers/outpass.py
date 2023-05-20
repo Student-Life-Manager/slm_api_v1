@@ -85,6 +85,24 @@ class OutpassController(BaseController[OutpassCreate, OutpassUpdate]):
 
         return self.crud_outpass.update(outpass, attributes)
 
+    def delete(self, outpass_uuid: UUID) -> bool:
+        outpass = self.crud_outpass.get_by_uuid(outpass_uuid)
+
+        print("outpass chosen for deletion", outpass_uuid)
+        if outpass.status in [
+            OutpassStatus.EXITED_CAMPUS,
+            OutpassStatus.RETURNED_TO_CAMPUS,
+            OutpassStatus.LATE_RETURN,
+        ]:
+            raise Forbidden("Not allowed to cancel outpass in this stage")
+
+        if not outpass:
+            raise NotFound("Outpass not found")
+
+        self.crud_outpass.delete(outpass)
+
+        return True
+
     def get_student_outpasses(self, student_id: int) -> list[Outpass]:
         return self.crud_outpass.get_student_outpasses(student_id)
 
