@@ -53,7 +53,6 @@ def create_outpass(
 
 
 @router.get("/", response_model=list[OutpassReturn])
-@admin_required
 def get_new_outpass(
     request: Request,
     outpass_controller: OutpassController = Depends(get_outpass_controller),
