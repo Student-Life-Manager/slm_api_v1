@@ -11,6 +11,7 @@ from app.schema.auth_user import (
     AuthUserCreate,
     AuthUserHostelDetails,
     AuthUserRegisterReturn,
+    AuthUserLoggedInReturn,
     AuthUserTokenReturn,
     AuthUserUpdate,
     StudentAcademicDetails,
@@ -66,20 +67,20 @@ class AuthUserController(
         )
         return student_user_register
 
-    def login(self, email: str, password: str):
+    def login(self, email: str, password: str) -> AuthUserLoggedInReturn:
         auth_user = self.crud_auth_user.get_by_email(email)
         if not auth_user:
             raise BadRequest("No account exists with this email")
         if not PasswordHandler.verify(auth_user.password, password):
             raise Unauthorized("Password provided is incorrect")
+        
+        jwt_token = {"access_token": JWTHandler.encode({"auth_user_id": auth_user.id}),
+        "refresh_token": JWTHandler.encode(
+            {"auth_user_id": auth_user.id, "sub": "refresh_token"},
+            settings.AUTH_CONFIG.JWT_REFRESH_TOKEN_EXPIRY_IN_DAYS,
+        )}
 
-        return {
-            "access_token": JWTHandler.encode({"auth_user_id": auth_user.id}),
-            "refresh_token": JWTHandler.encode(
-                {"auth_user_id": auth_user.id, "sub": "refresh_token"},
-                settings.AUTH_CONFIG.JWT_REFRESH_TOKEN_EXPIRY_IN_DAYS,
-            ),
-        }
+        return AuthUserLoggedInReturn(auth_user=auth_user,jwt_token=jwt_token)
 
     def update(
         self, auth_user: AuthUser, auth_user_update: AuthUserUpdate

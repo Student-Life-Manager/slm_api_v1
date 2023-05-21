@@ -139,3 +139,8 @@ class AuthUserWithGuardiansReturn(AuthUserReturn):
 class AuthUserHomeReturn(BaseModel):
     auth_user: AuthUserBasicReturn
     outpass: list[object]
+
+
+class AuthUserLoggedInReturn(BaseModel):
+    auth_user : AuthUserReturn
+    jwt_token : AuthUserTokenReturn

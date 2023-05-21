@@ -8,6 +8,7 @@ from .auth_user import (
     AuthUserRegisterReturn,
     AuthUserReturn,
     AuthUserTokenReturn,
+    AuthUserLoggedInReturn,
     AuthUserUpdate,
     StudentAcademicDetails,
     StudentCreate,
