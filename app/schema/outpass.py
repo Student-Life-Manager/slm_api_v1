@@ -63,3 +63,9 @@ class OutpassWithGuardianAndWardenReturn(OutpassReturn):
 class OutpassApproval(BaseModel):
     warden_1: bool = False
     warden_2: bool = False
+
+class OutpassRejection(BaseModel):
+    warden_message : str
+
+class OutpassStatusChange(BaseModel):
+    status : OutpassStatus

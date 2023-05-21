@@ -14,7 +14,7 @@ from app.api.endpoints.dependencies import (
 from app.controllers import AuthUserController, GuardianController, OutpassController
 from app.core.exceptions import BadRequest, NotFound
 from app.schema import AuthUserAccountType, OutpassCreate, OutpassReturn
-from app.schema.outpass import OutpassStatus
+from app.schema.outpass import OutpassStatus, OutpassRejection, OutpassStatusChange
 
 router = APIRouter(prefix="/outpasses")
 
@@ -160,8 +160,8 @@ def update_outpass(
 @warden_route
 def update_outpass_status(
     outpass_uuid: UUID,
-    status: OutpassStatus,
     request: Request,
+    outpass_status_change : OutpassStatusChange,
     outpass_controller: OutpassController = Depends(get_outpass_controller),
 ):
     """
@@ -170,7 +170,25 @@ def update_outpass_status(
 
     outpass = outpass_controller.get_by_uuid(outpass_uuid)
 
-    return outpass_controller.update_outpass_status(outpass, status)
+    return outpass_controller.update_outpass_status(outpass, outpass_status_change.status)
+
+
+
+@router.patch("/{outpass_uuid}/reject", response_model=OutpassReturn)
+@warden_route
+def reject_outpass(
+    outpass_uuid: UUID,
+    request: Request,
+    outpass_rejection : OutpassRejection,
+    outpass_controller: OutpassController = Depends(get_outpass_controller),
+):
+    """
+    Reject outpass 
+    """
+
+    outpass = outpass_controller.get_by_uuid(outpass_uuid)
+
+    return outpass_controller.reject_outpass(outpass, outpass_rejection.warden_message)
 
 
 @router.delete("/{outpass_uuid}")
