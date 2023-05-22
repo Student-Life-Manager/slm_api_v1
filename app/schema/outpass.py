@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from .auth_user import AuthUserReturn
+from .auth_user import AuthUserBasicReturn, AuthUserReturn
 from .generic import GenericReturn
 from .guardian import GuardianReturn
 
@@ -55,6 +55,10 @@ class OutpassReturn(GenericReturn):
         orm_mode = True
 
 
+class OutpassWithStudentReturn(OutpassReturn):
+    student: AuthUserBasicReturn
+
+
 class OutpassWithGuardianAndWardenReturn(OutpassReturn):
     warden: AuthUserReturn
     guardian: GuardianReturn
@@ -64,8 +68,10 @@ class OutpassApproval(BaseModel):
     warden_1: bool = False
     warden_2: bool = False
 
+
 class OutpassRejection(BaseModel):
-    warden_message : str
+    warden_message: str
+
 
 class OutpassStatusChange(BaseModel):
-    status : OutpassStatus
+    status: OutpassStatus

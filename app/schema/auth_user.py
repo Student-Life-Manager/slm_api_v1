@@ -142,5 +142,5 @@ class AuthUserHomeReturn(BaseModel):
 
 
 class AuthUserLoggedInReturn(BaseModel):
-    auth_user : AuthUserReturn
-    jwt_token : AuthUserTokenReturn
+    auth_user: AuthUserReturn
+    jwt_token: AuthUserTokenReturn

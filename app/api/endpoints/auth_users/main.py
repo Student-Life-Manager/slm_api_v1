@@ -5,10 +5,10 @@ from app.api.endpoints.dependencies.permissions import auth_required
 from app.controllers import AuthUserController
 from app.schema import (
     AuthUserAuthRefresh,
+    AuthUserLoggedInReturn,
     AuthUserLogin,
     AuthUserPasswordUpdate,
     AuthUserReturn,
-    AuthUserLoggedInReturn,
     AuthUserTokenReturn,
     AuthUserUpdate,
 )
@@ -16,7 +16,7 @@ from app.schema import (
 router = APIRouter(prefix="/auth_users")
 
 
-@router.post("/login", response_model = AuthUserLoggedInReturn)
+@router.post("/login", response_model=AuthUserLoggedInReturn)
 def login(
     auth_user_login: AuthUserLogin,
     auth_user_controller: AuthUserController = Depends(get_auth_user_controller),

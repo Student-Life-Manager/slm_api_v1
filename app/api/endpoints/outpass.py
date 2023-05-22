@@ -14,7 +14,12 @@ from app.api.endpoints.dependencies import (
 from app.controllers import AuthUserController, GuardianController, OutpassController
 from app.core.exceptions import BadRequest, NotFound
 from app.schema import AuthUserAccountType, OutpassCreate, OutpassReturn
-from app.schema.outpass import OutpassStatus, OutpassRejection, OutpassStatusChange
+from app.schema.outpass import (
+    OutpassRejection,
+    OutpassStatus,
+    OutpassStatusChange,
+    OutpassWithStudentReturn,
+)
 
 router = APIRouter(prefix="/outpasses")
 
@@ -52,7 +57,7 @@ def create_outpass(
     return outpass
 
 
-@router.get("/", response_model=list[OutpassReturn])
+@router.get("/", response_model=list[OutpassWithStudentReturn])
 def get_new_outpass(
     request: Request,
     outpass_controller: OutpassController = Depends(get_outpass_controller),
@@ -61,7 +66,7 @@ def get_new_outpass(
     Adds a new outpass
     """
 
-    outpasses = outpass_controller.get_multi()
+    outpasses = outpass_controller.get_multi(with_=["student"])
 
     return outpasses
 
@@ -161,7 +166,7 @@ def update_outpass(
 def update_outpass_status(
     outpass_uuid: UUID,
     request: Request,
-    outpass_status_change : OutpassStatusChange,
+    outpass_status_change: OutpassStatusChange,
     outpass_controller: OutpassController = Depends(get_outpass_controller),
 ):
     """
@@ -170,8 +175,9 @@ def update_outpass_status(
 
     outpass = outpass_controller.get_by_uuid(outpass_uuid)
 
-    return outpass_controller.update_outpass_status(outpass, outpass_status_change.status)
-
+    return outpass_controller.update_outpass_status(
+        outpass, outpass_status_change.status
+    )
 
 
 @router.patch("/{outpass_uuid}/reject", response_model=OutpassReturn)
@@ -179,11 +185,11 @@ def update_outpass_status(
 def reject_outpass(
     outpass_uuid: UUID,
     request: Request,
-    outpass_rejection : OutpassRejection,
+    outpass_rejection: OutpassRejection,
     outpass_controller: OutpassController = Depends(get_outpass_controller),
 ):
     """
-    Reject outpass 
+    Reject outpass
     """
 
     outpass = outpass_controller.get_by_uuid(outpass_uuid)

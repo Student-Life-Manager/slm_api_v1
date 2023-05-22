@@ -5,7 +5,7 @@ from app.core.exceptions import BadRequest, Forbidden
 from app.crud import CRUDAuthUser, CRUDOutpass
 from app.models import AuthUser, Outpass
 from app.schema import OutpassCreate, OutpassUpdate
-from app.schema.outpass import OutpassApproval, OutpassStatus, OutpassRejection
+from app.schema.outpass import OutpassApproval, OutpassRejection, OutpassStatus
 
 from .base import BaseController
 
@@ -49,21 +49,28 @@ class OutpassController(BaseController[OutpassCreate, OutpassUpdate]):
 
         approval["warden_1"] = warden.id
 
-        attributes = {"approval": approval, "approved_at": datetime.now(timezone.utc),"status" : OutpassStatus.IN_CAMPUS}
+        attributes = {
+            "approval": approval,
+            "approved_at": datetime.now(timezone.utc),
+            "status": OutpassStatus.IN_CAMPUS,
+        }
 
         return self.crud_outpass.update(outpass, attributes)
 
-    def reject_outpass(
-        self, outpass: Outpass, warden_message : str
-    ) -> Outpass:
-        
-        if outpass.status in [OutpassStatus.EXITED_CAMPUS, OutpassStatus.RETURNED_TO_CAMPUS, OutpassStatus.LATE_RETURN]:
+    def reject_outpass(self, outpass: Outpass, warden_message: str) -> Outpass:
+        if outpass.status in [
+            OutpassStatus.EXITED_CAMPUS,
+            OutpassStatus.RETURNED_TO_CAMPUS,
+            OutpassStatus.LATE_RETURN,
+        ]:
             raise Forbidden("Not allowed to reject an outpass in this stage")
 
-        attributes = {"status" : OutpassStatus.REJECTED.value, "warden_message" : warden_message }
+        attributes = {
+            "status": OutpassStatus.REJECTED.value,
+            "warden_message": warden_message,
+        }
 
         return self.crud_outpass.update(outpass, attributes)
-
 
     def get_outpass_by_student_id_and_uuid(
         self, student_id: int, uuid: UUID
@@ -77,8 +84,8 @@ class OutpassController(BaseController[OutpassCreate, OutpassUpdate]):
 
         if status == OutpassStatus.REJECTED and outpass.status == OutpassStatus.CREATED:
             attributes["status"] = OutpassStatus.REJECTED.value
-        elif status == OutpassStatus.REJECTED and outpass.status == OutpassStatus.IN_CAMPUS:
-            raise BadRequest("Cannot reject an outpass after it has been accepted.")
+        # elif status == OutpassStatus.REJECTED and outpass.status == OutpassStatus.IN_CAMPUS:
+        #     raise BadRequest("Cannot reject an outpass after it has been accepted.")
 
         match status:
             case OutpassStatus.IN_CAMPUS:

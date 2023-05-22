@@ -1,14 +1,15 @@
 from .auth_user import (
     AuthUserAccountType,
     AuthUserAuthRefresh,
+    AuthUserBasicReturn,
     AuthUserCreate,
     AuthUserHomeReturn,
+    AuthUserLoggedInReturn,
     AuthUserLogin,
     AuthUserPasswordUpdate,
     AuthUserRegisterReturn,
     AuthUserReturn,
     AuthUserTokenReturn,
-    AuthUserLoggedInReturn,
     AuthUserUpdate,
     StudentAcademicDetails,
     StudentCreate,
@@ -16,4 +17,9 @@ from .auth_user import (
     WardenCreate,
 )
 from .guardian import GuardianCreate, GuardianReturn, GuardianUpdate
-from .outpass import OutpassCreate, OutpassReturn, OutpassUpdate
+from .outpass import (
+    OutpassCreate,
+    OutpassReturn,
+    OutpassUpdate,
+    OutpassWithStudentReturn,
+)
