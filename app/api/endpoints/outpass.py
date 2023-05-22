@@ -191,10 +191,13 @@ def reject_outpass(
     """
     Reject outpass
     """
+    warden = request.state.auth_user
 
     outpass = outpass_controller.get_by_uuid(outpass_uuid)
 
-    return outpass_controller.reject_outpass(outpass, outpass_rejection.warden_message)
+    return outpass_controller.reject_outpass(
+        outpass, outpass_rejection.warden_message, warden_uuid=warden.uuid
+    )
 
 
 @router.delete("/{outpass_uuid}")

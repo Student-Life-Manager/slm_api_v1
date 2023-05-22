@@ -36,6 +36,7 @@ class Outpass(Base):
     returned_at = Column(DateTime)
     warden_message = Column(String)
     approval = Column(MutableDict.as_mutable(JSONB), nullable=False)
+    rejection = Column(MutableDict.as_mutable(JSONB), nullable=False)
 
     # Relationships with auth user table
     student_id = Column(BigInteger, ForeignKey("auth_user.id"), nullable=False)

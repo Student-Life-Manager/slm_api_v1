@@ -41,6 +41,11 @@ class OutpassApproval(BaseModel):
     warden_2: str | None = None
 
 
+class OutpassRejectionDetails(BaseModel):
+    warden_1: str | None = None
+    warden_2: str | None = None
+
+
 class OutpassReturn(GenericReturn):
     uuid: UUID
     out_date: date
@@ -55,6 +60,7 @@ class OutpassReturn(GenericReturn):
     returned_at: datetime | None
     warden_message: str | None
     approval: OutpassApproval
+    rejection: OutpassRejectionDetails
 
     class Config:
         orm_mode = True

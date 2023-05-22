@@ -5,7 +5,12 @@ from app.core.exceptions import BadRequest, Forbidden
 from app.crud import CRUDAuthUser, CRUDOutpass
 from app.models import AuthUser, Outpass
 from app.schema import OutpassCreate, OutpassUpdate
-from app.schema.outpass import OutpassApproval, OutpassRejection, OutpassStatus
+from app.schema.outpass import (
+    OutpassApproval,
+    OutpassRejection,
+    OutpassRejectionDetails,
+    OutpassStatus,
+)
 
 from .base import BaseController
 
@@ -38,6 +43,9 @@ class OutpassController(BaseController[OutpassCreate, OutpassUpdate]):
         if not hasattr(attributes, "approval"):
             attributes["approval"] = OutpassApproval().__dict__
 
+        if not hasattr(attributes, "rejection"):
+            attributes["rejection"] = OutpassRejectionDetails().__dict__
+
         outpass = self.crud_outpass.create(attributes)
 
         return outpass
@@ -57,7 +65,9 @@ class OutpassController(BaseController[OutpassCreate, OutpassUpdate]):
 
         return self.crud_outpass.update(outpass, attributes)
 
-    def reject_outpass(self, outpass: Outpass, warden_message: str) -> Outpass:
+    def reject_outpass(
+        self, outpass: Outpass, warden_message: str, warden_uuid: UUID
+    ) -> Outpass:
         if outpass.status in [
             OutpassStatus.EXITED_CAMPUS,
             OutpassStatus.RETURNED_TO_CAMPUS,
@@ -65,7 +75,12 @@ class OutpassController(BaseController[OutpassCreate, OutpassUpdate]):
         ]:
             raise Forbidden("Not allowed to reject an outpass in this stage")
 
+        rejection = outpass.rejection
+
+        rejection["warden_1"] = str(warden_uuid)
+
         attributes = {
+            "rejection": rejection,
             "status": OutpassStatus.REJECTED.value,
             "warden_message": warden_message,
         }
