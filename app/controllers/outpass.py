@@ -47,7 +47,7 @@ class OutpassController(BaseController[OutpassCreate, OutpassUpdate]):
     ) -> Outpass:
         approval = outpass.approval
 
-        approval["warden_1"] = warden.id
+        approval["warden_1"] = str(warden.uuid)
 
         attributes = {
             "approval": approval,

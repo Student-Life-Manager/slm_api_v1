@@ -15,6 +15,7 @@ MAX_NUMBER_OF_USERS = 123
 class AuthUserAccountType(str, Enum):
     STUDENT = "student"
     WARDEN = "warden"
+    GUARD = "guard"
     ADMIN = "admin"
 
 

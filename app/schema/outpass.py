@@ -36,6 +36,11 @@ class OutpassUpdate(BaseModel):
     alternate_phone_number: str | None = None
 
 
+class OutpassApproval(BaseModel):
+    warden_1: str | None = None
+    warden_2: str | None = None
+
+
 class OutpassReturn(GenericReturn):
     uuid: UUID
     out_date: date
@@ -49,7 +54,7 @@ class OutpassReturn(GenericReturn):
     exited_at: datetime | None
     returned_at: datetime | None
     warden_message: str | None
-    approval: dict
+    approval: OutpassApproval
 
     class Config:
         orm_mode = True
@@ -62,11 +67,6 @@ class OutpassWithStudentReturn(OutpassReturn):
 class OutpassWithGuardianAndWardenReturn(OutpassReturn):
     warden: AuthUserReturn
     guardian: GuardianReturn
-
-
-class OutpassApproval(BaseModel):
-    warden_1: bool = False
-    warden_2: bool = False
 
 
 class OutpassRejection(BaseModel):

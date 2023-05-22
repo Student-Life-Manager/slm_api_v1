@@ -16,6 +16,4 @@ export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin/"
 
 
 ### TODO 
-- fix outpass route (all outpassses route, need to return student details as well, name, roll no)
-- in approving outpass, instead of id, update with warden uuid (for this route {{base_url}}/outpasses/me) 
 - add guard account type
