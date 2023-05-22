@@ -12,3 +12,10 @@ export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/b
 # Add Docker Desktop for Mac (docker)
 export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin/"
 ```
+
+
+
+### TODO 
+- fix approve route
+- fix outpass route (all outpassses route, need to return student details as well, name, roll no)
+- fix reject outpass route

@@ -49,7 +49,7 @@ class OutpassController(BaseController[OutpassCreate, OutpassUpdate]):
 
         approval["warden_1"] = warden.id
 
-        attributes = {"approval": approval, "approved_at": datetime.now(timezone.utc)}
+        attributes = {"approval": approval, "approved_at": datetime.now(timezone.utc),"status" : OutpassStatus.IN_CAMPUS}
 
         return self.crud_outpass.update(outpass, attributes)
 
