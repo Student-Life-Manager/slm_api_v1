@@ -98,6 +98,10 @@ class WardenChecklist(BaseModel):
     hostel_details: bool = False
 
 
+class GuardChecklist(BaseModel):
+    personal_details: bool = False
+
+
 class AuthUserPasswordUpdate(BaseModel):
     password: str
 

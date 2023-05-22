@@ -14,6 +14,7 @@ from app.schema.auth_user import (
     AuthUserRegisterReturn,
     AuthUserTokenReturn,
     AuthUserUpdate,
+    GuardChecklist,
     StudentAcademicDetails,
     StudentChecklist,
     WardenChecklist,
@@ -50,6 +51,10 @@ class AuthUserController(
 
         elif user_type == AuthUserAccountType.WARDEN:
             attributes["checklist"] = WardenChecklist().__dict__
+            attributes["academic_details"] = None
+
+        elif user_type == AuthUserAccountType.GUARD:
+            attributes["checklist"] = GuardChecklist().__dict__
             attributes["academic_details"] = None
 
         new_user = self.crud_auth_user.create(attributes)
