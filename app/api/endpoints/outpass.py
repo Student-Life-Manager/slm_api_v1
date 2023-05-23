@@ -8,6 +8,7 @@ from app.api.endpoints.dependencies import (
     get_auth_user_controller,
     get_guardian_controller,
     get_outpass_controller,
+    guard_route,
     student_route,
     warden_route,
 )
@@ -162,7 +163,7 @@ def update_outpass(
 
 
 @router.patch("/{outpass_uuid}/status", response_model=OutpassReturn)
-@warden_route
+@guard_route
 def update_outpass_status(
     outpass_uuid: UUID,
     request: Request,

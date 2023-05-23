@@ -105,6 +105,25 @@ def student_route(func):
     return wrapper
 
 
+def guard_route(func):
+    @wraps(func)
+    @auth_required
+    def wrapper(*args, **kwargs):
+        request: Request = kwargs["request"]
+
+        auth_user: AuthUser = request.state.auth_user
+
+        if not auth_user:
+            raise BadRequest("No auth user found.")
+
+        if auth_user.account_type != AuthUserAccountType.GUARD:
+            raise Unauthorized("Unauthorized.")
+
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
 def validate_token(access_token: str) -> int:
     """
     validate and decode access_token
