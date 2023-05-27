@@ -13,7 +13,10 @@ export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/b
 export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin/"
 ```
 
+### Create migrations 
 
+`export POSTGRES_URL=postgresql://slm_user:slm@127.0.0.1:5432/slm-db`
 
-### TODO 
-- add guard account type
+`alembic revision --autogenerate -m "migration_message"`
+
+`make db-migrate`

@@ -32,6 +32,8 @@ def create_new_user(
     if existing_auth_user:
         raise BadRequest(message="Auth user already exists with this email.")
 
+    
+
     auth_user = auth_user_controller.register(
         auth_user_create, AuthUserAccountType.STUDENT
     )
@@ -107,3 +109,5 @@ def update_me(
     return auth_user_controller.update(
         auth_user=auth_user, auth_user_update=auth_user_update
     )
+
+
