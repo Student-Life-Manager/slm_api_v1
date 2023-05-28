@@ -108,7 +108,7 @@ class OutpassController(BaseController[OutpassCreate, OutpassUpdate]):
             student_id=student_id, uuid=uuid
         )
 
-   def update_outpass_status(self, outpass: Outpass, status: OutpassStatus) -> Outpass:
+    def update_outpass_status(self, outpass: Outpass, status: OutpassStatus) -> Outpass:
         attributes = {}
 
         if status == OutpassStatus.REJECTED and outpass.status == OutpassStatus.CREATED:

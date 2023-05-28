@@ -44,12 +44,13 @@ def add_new_guardian(
     """
 
     student = auth_user_controller.get(request.state.auth_user_id)
+    print("________student id_______", student.id)
 
     if not student:
         raise NotFound(message="No user found.")
 
     guardian = guardian_controller.create(
-        guardian_create=guardian_create, student_id=student.id
+        guardian_create=guardian_create, student_id=request.state.auth_user_id,
     )
 
     return guardian
@@ -104,8 +105,6 @@ def get_guardian_otp(
 
 
 @router.patch("/{guardian_uuid}/verify")
-@auth_required
-@admin_required
 def verify_guardian(
     guardian_uuid: UUID,
     code: str,

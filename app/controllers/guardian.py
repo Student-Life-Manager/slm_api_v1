@@ -46,8 +46,8 @@ class GuardianController(BaseController[Guardian, GuardianUpdate]):
             raise BadRequest("Guardian with this phone number already exists.")
 
         attributes = self.extract_attributes_from_schema(guardian_create)
-        attributes = "+91" + guardian_create.phone_number
-        attributes["student_id"] = student_id
+        attributes["phone_number"] = "+91" + guardian_create.phone_number
+        attributes["student_id"] = int(student_id)
 
         return self.crud_guardian.create(attributes=attributes)
 
@@ -112,7 +112,7 @@ class GuardianController(BaseController[Guardian, GuardianUpdate]):
     def get_guardian_with_student_id_and_uuid(
         self, student_id: int, guardian_uuid: UUID
     ) -> Guardian:
-        return self.crud_guardian.get_guardian_with_student_id_and_uuid(
+        return self.crud_guardian.get_guardian_with_uuid_and_student_id(
             student_id=student_id, uuid=guardian_uuid
         )
 
