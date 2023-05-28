@@ -10,7 +10,7 @@ from app.api.endpoints.dependencies import (
 )
 from app.controllers import AuthUserController, GuardianController
 from app.core.exceptions import NotFound
-from app.schema import GuardianCreate, GuardianReturn
+from app.schema import GuardianCreate, GuardianReturn, VerificationCodeReturn
 
 router = APIRouter(prefix="/guardians")
 
@@ -86,11 +86,29 @@ def remove_guardian(
     )
 
 
+@router.get("/{guardian_uuid}/code", response_model=VerificationCodeReturn)
+@auth_required
+def get_guardian_otp(
+    guardian_uuid: UUID,
+    request: Request,
+    guardian_controller: GuardianController = Depends(get_guardian_controller),
+):
+    student_id = request.state.auth_user_id
+    guardian = guardian_controller.get_guardian_with_student_id_and_uuid(
+        student_id=student_id, guardian_uuid=guardian_uuid
+    )
+
+    return guardian_controller.send_guardian_verification_message(
+        auth_user=request.state.auth_user, guardian=guardian
+    )
+
+
 @router.patch("/{guardian_uuid}/verify")
 @auth_required
 @admin_required
 def verify_guardian(
     guardian_uuid: UUID,
+    code: str,
     request: Request,
     guardian_controller: GuardianController = Depends(get_guardian_controller),
 ):

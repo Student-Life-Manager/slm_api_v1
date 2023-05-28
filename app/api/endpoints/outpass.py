@@ -1,4 +1,4 @@
-from uuid import UUID
+from uuid UUID
 
 from fastapi import APIRouter, Depends, Request
 
@@ -111,8 +111,10 @@ def approve_outpass(
     Returns all the details of an outpass
     """
     warden = request.state.auth_user
-
-    outpass = outpass_controller.get_by_uuid(outpass_uuid)
+    outpass = outpass_controller.get_by_uuid(
+        outpass_uuid, with_=["student", "guardian"]
+    )
+    # outpass = outpass_controller.get_by_uuid(outpass_uuid)
 
     if not outpass:
         raise NotFound("Outpass not found.")

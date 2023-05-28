@@ -18,6 +18,7 @@ from app.schema import (
 
 router = APIRouter(prefix="/students")
 
+
 @router.post("/register", response_model=AuthUserRegisterReturn)
 def create_new_user(
     auth_user_create: AuthUserCreate,

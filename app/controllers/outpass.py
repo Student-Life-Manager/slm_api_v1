@@ -11,14 +11,17 @@ from app.schema.outpass import (
     OutpassRejectionDetails,
     OutpassStatus,
 )
+from app.services.twilio import TwilioService
 
 from .base import BaseController
 
 
 class OutpassController(BaseController[OutpassCreate, OutpassUpdate]):
-    def __init__(self, db, crud_outpass: CRUDOutpass):
+    def __init__(self, db, crud_outpass: CRUDOutpass, twilio_service: TwilioService):
         super().__init__(model=Outpass, db=db, crud_instance=crud_outpass)
         self.crud_outpass = crud_outpass
+        self.twilio_service = twilio_service
+
 
     def create(
         self,
@@ -63,7 +66,18 @@ class OutpassController(BaseController[OutpassCreate, OutpassUpdate]):
             "status": OutpassStatus.IN_CAMPUS,
         }
 
-        return self.crud_outpass.update(outpass, attributes)
+
+        outpass = self.crud_outpass.update(outpass, attributes)
+
+        # copy this for reject outpass function
+        self.twilio_service.send_verification_message(
+            phone_number=outpass.guardian.phone_number,
+            message=f"Outpass permission was granted to {outpass.student.first_name} {outpass.student.last_name} by {warden.first_name} {warden.last_name} after your approval",
+        )
+
+        return outpass
+
+        return outpass
 
     def reject_outpass(
         self, outpass: Outpass, warden_message: str, warden_uuid: UUID
@@ -94,13 +108,13 @@ class OutpassController(BaseController[OutpassCreate, OutpassUpdate]):
             student_id=student_id, uuid=uuid
         )
 
-    def update_outpass_status(self, outpass: Outpass, status: OutpassStatus) -> Outpass:
+   def update_outpass_status(self, outpass: Outpass, status: OutpassStatus) -> Outpass:
         attributes = {}
 
         if status == OutpassStatus.REJECTED and outpass.status == OutpassStatus.CREATED:
             attributes["status"] = OutpassStatus.REJECTED.value
-        # elif status == OutpassStatus.REJECTED and outpass.status == OutpassStatus.IN_CAMPUS:
-        #     raise BadRequest("Cannot reject an outpass after it has been accepted.")
+        elif status == OutpassStatus.REJECTED:
+            raise BadRequest("Cannot reject an outpass after it has been accepted.")
 
         match status:
             case OutpassStatus.IN_CAMPUS:

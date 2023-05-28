@@ -24,9 +24,15 @@ class AWSConfig(SLMBaseConfig):
     AWS_REGION: str = ""
 
 
+class TwilioConfig(SLMBaseConfig):
+    TWILIO_ACCOUNT_SID: str = ""
+    TWILIO_AUTH_TOKEN: str = ""
+    TWILIO_SENDER_PHONE_NUMBER: str = ""
+
+
 class Settings(SLMBaseConfig):
     SENTRY_CONFIG: SentryConfig = SentryConfig()
-    AWS_CONFIG: AWSConfig = AWSConfig()
+    TWILIO_CONFIG: TwilioConfig = TwilioConfig()
     AUTH_CONFIG: AuthConfig = AuthConfig()
 
     DEBUG: int = 0

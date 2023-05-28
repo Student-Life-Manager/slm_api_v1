@@ -23,3 +23,4 @@ from .outpass import (
     OutpassUpdate,
     OutpassWithStudentReturn,
 )
+from .verification_code import VerificationCodeReturn
