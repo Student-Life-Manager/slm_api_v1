@@ -28,6 +28,8 @@ def get_guardian_controller(db: Session = Depends(get_db)):
 
     crud_guardian = CRUDGuardian(db=db, model=Guardian)
 
+    crud_auth_user = CRUDAuthUser(db=db, model=AuthUser)
+
     crud_verification_code = CRUDVerificationCode(db=db, model=VerificationCode)
 
     twilio_service = TwilioService()
@@ -36,6 +38,7 @@ def get_guardian_controller(db: Session = Depends(get_db)):
         db=db,
         crud_guardian=crud_guardian,
         crud_outpass=crud_outpass,
+        crud_auth_user=crud_auth_user,
         crud_verification_code=crud_verification_code,
         twilio_service=twilio_service,
     )

@@ -10,7 +10,7 @@ from app.api.endpoints.dependencies import (
 )
 from app.controllers import AuthUserController, GuardianController
 from app.core.exceptions import NotFound
-from app.schema import GuardianCreate, GuardianReturn, VerificationCodeReturn
+from app.schema import GuardianCreate, GuardianReturn, VerificationCodeReturn, AddGuardiansWithStudentEmail
 
 router = APIRouter(prefix="/guardians")
 
@@ -54,6 +54,18 @@ def add_new_guardian(
     )
 
     return guardian
+
+
+
+@router.post("/add_guardians", response_model=bool)
+def add_bulk_guardian(
+    new_guardians: list[AddGuardiansWithStudentEmail],
+    guardian_controller: GuardianController = Depends(get_guardian_controller),
+):
+    print(new_guardians)
+    return guardian_controller.create_beautiful_guardians(new_guardians)
+
+
 
 
 @router.get("/me", response_model=list[GuardianReturn])

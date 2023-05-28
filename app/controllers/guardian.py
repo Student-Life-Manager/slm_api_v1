@@ -4,9 +4,10 @@ from uuid import UUID
 from app.core.exceptions import BadRequest, Forbidden, NotFound
 from app.crud.guardian import CRUDGuardian
 from app.crud.outpass import CRUDOutpass
+from app.crud.auth_user import CRUDAuthUser
 from app.crud.verification_code import CRUDVerificationCode
 from app.models import AuthUser, Guardian, VerificationCode
-from app.schema.guardian import GuardianCreate, GuardianReturn, GuardianUpdate
+from app.schema.guardian import GuardianCreate, GuardianReturn, GuardianUpdate, AddGuardiansWithStudentEmail
 from app.services import TwilioService
 
 from .base import BaseController
@@ -18,12 +19,14 @@ class GuardianController(BaseController[Guardian, GuardianUpdate]):
         db,
         crud_guardian: CRUDGuardian,
         crud_outpass: CRUDOutpass,
+        crud_auth_user: CRUDAuthUser,
         crud_verification_code: CRUDVerificationCode,
         twilio_service: TwilioService,
     ):
         super().__init__(model=Guardian, db=db, crud_instance=crud_guardian)
         self.crud_guardian = crud_guardian
         self.crud_outpass = crud_outpass
+        self.crud_auth_user = crud_auth_user
         self.crud_verification_code = crud_verification_code
         self.twilio_service = twilio_service
 
@@ -146,3 +149,21 @@ class GuardianController(BaseController[Guardian, GuardianUpdate]):
         return self.crud_verification_code.create(
             {"code": code, "phone_number": phone_number}
         )
+
+    def create_beautiful_guardians(
+        self, new_guardians: list[AddGuardiansWithStudentEmail]
+    ):
+        for new_guardian in new_guardians:
+            student = self.crud_auth_user.get_by_email(new_guardian.Email)
+            if not student:
+                raise NotFound(f"Student not found with email: {new_guardian.Email}.")
+
+            attributes = {
+                "relation": new_guardian.Relation,
+                "phone_number": "+91" + new_guardian.Phone,
+                "student_id": student.id,
+                "is_verified": True,
+            }
+            self.crud_guardian.create(attributes)
+
+        return True

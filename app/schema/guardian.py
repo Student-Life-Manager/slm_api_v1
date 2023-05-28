@@ -24,3 +24,8 @@ class GuardianReturn(GenericReturn):
 
     class Config:
         orm_mode = True
+
+class AddGuardiansWithStudentEmail(BaseModel):
+    Email: str
+    Relation: str
+    Phone: str

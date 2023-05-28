@@ -16,7 +16,7 @@ from .auth_user import (
     WardenChecklist,
     WardenCreate,
 )
-from .guardian import GuardianCreate, GuardianReturn, GuardianUpdate
+from .guardian import GuardianCreate, GuardianReturn, GuardianUpdate, AddGuardiansWithStudentEmail
 from .outpass import (
     OutpassCreate,
     OutpassReturn,
