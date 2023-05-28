@@ -18,7 +18,6 @@ from app.schema import (
 
 router = APIRouter(prefix="/students")
 
-
 @router.post("/register", response_model=AuthUserRegisterReturn)
 def create_new_user(
     auth_user_create: AuthUserCreate,
@@ -55,7 +54,6 @@ def get_student_home(
 
 
 @router.get("/", response_model=list[AuthUserReturn])
-@admin_required
 def get_all_students(
     request: Request,
     auth_user_controller: AuthUserController = Depends(get_auth_user_controller),

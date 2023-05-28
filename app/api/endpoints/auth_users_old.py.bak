@@ -89,7 +89,6 @@ def get_student_home(
 
 
 @router.get("/students", response_model=list[AuthUserReturn])
-@admin_required
 def get_all_students(
     request: Request,
     auth_user_controller: AuthUserController = Depends(get_auth_user_controller),
@@ -104,7 +103,6 @@ def get_all_students(
 
 @router.get("/wardens")
 @auth_required
-@admin_required
 def get_all_wardens(
     auth_user_controller: AuthUserController = Depends(get_auth_user_controller),
 ):
