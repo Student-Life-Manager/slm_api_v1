@@ -61,6 +61,12 @@ class WardenCreate(BaseModel):
 class AuthUserCreate(BaseModel):
     email: EmailStr
     password: str
+    first_name: str | None = None
+    last_name: str | None = None
+    roll_number: str | None = None
+    phone_number: str | None = None
+    hostel_details: AuthUserHostelDetails | None = None
+    academic_details: StudentAcademicDetails | None = None
 
 
 class AuthUserLogin(BaseModel):

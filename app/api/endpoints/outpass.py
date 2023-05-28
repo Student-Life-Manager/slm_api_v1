@@ -59,7 +59,7 @@ def create_outpass(
 
 
 @router.get("/", response_model=list[OutpassWithStudentReturn])
-def get_new_outpass(
+def get_all_outpasses(
     request: Request,
     outpass_controller: OutpassController = Depends(get_outpass_controller),
 ):
@@ -67,7 +67,7 @@ def get_new_outpass(
     Adds a new outpass
     """
 
-    outpasses = outpass_controller.get_multi(with_=["student"])
+    outpasses = outpass_controller.get_multi(with_=["student","guardian"])
 
     return outpasses
 

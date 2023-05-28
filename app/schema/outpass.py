@@ -61,6 +61,7 @@ class OutpassReturn(GenericReturn):
     warden_message: str | None
     approval: OutpassApproval
     rejection: OutpassRejectionDetails
+    guardian: GuardianReturn
 
     class Config:
         orm_mode = True

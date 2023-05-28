@@ -67,7 +67,7 @@ def get_all_students(
     return students
 
 
-@router.patch("/me/onboarding", response_model=AuthUserReturn)
+@router.patch("/me/update_profile", response_model=AuthUserReturn)
 @auth_required
 def update_my_profile(
     auth_user_update: AuthUserUpdate,

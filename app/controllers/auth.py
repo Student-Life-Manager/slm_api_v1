@@ -44,10 +44,9 @@ class AuthUserController(
         attributes = self.extract_attributes_from_schema(create_auth_user)
         attributes["password"] = password
         attributes["account_type"] = user_type
-        attributes["hostel_details"] = AuthUserHostelDetails().__dict__
+        # attributes["hostel_details"] = AuthUserHostelDetails().__dict__
         if user_type == AuthUserAccountType.STUDENT:
             attributes["checklist"] = StudentChecklist().__dict__
-            attributes["academic_details"] = StudentAcademicDetails().__dict__
 
         elif user_type == AuthUserAccountType.WARDEN:
             attributes["checklist"] = WardenChecklist().__dict__

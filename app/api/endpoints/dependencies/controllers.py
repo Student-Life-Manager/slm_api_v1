@@ -47,4 +47,5 @@ def get_outpass_controller(db: Session = Depends(get_db)):
     """
     crud_outpass = CRUDOutpass(db=db, model=Outpass)
 
-    return OutpassController(db=db, crud_outpass=crud_outpass)
+    twilio_service = TwilioService()
+    return OutpassController(db=db, crud_outpass=crud_outpass, twilio_service=twilio_service)
