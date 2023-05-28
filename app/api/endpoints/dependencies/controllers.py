@@ -5,9 +5,10 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from app.controllers import AuthUserController, GuardianController, OutpassController
-from app.crud import CRUDAuthUser, CRUDGuardian, CRUDOutpass
+from app.crud import CRUDAuthUser, CRUDGuardian, CRUDOutpass, CRUDVerificationCode
 from app.database.session import get_db
-from app.models import AuthUser, Guardian, Outpass
+from app.models import AuthUser, Guardian, Outpass, VerificationCode
+from app.services import TwilioService
 
 
 def get_auth_user_controller(db: Session = Depends(get_db)):
@@ -27,8 +28,16 @@ def get_guardian_controller(db: Session = Depends(get_db)):
 
     crud_guardian = CRUDGuardian(db=db, model=Guardian)
 
+    crud_verification_code = CRUDVerificationCode(db=db, model=VerificationCode)
+
+    twilio_service = TwilioService()
+
     return GuardianController(
-        db=db, crud_guardian=crud_guardian, crud_outpass=crud_outpass
+        db=db,
+        crud_guardian=crud_guardian,
+        crud_outpass=crud_outpass,
+        crud_verification_code=crud_verification_code,
+        twilio_service=twilio_service,
     )
 
 

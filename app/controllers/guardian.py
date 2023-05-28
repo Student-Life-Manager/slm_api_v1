@@ -140,7 +140,7 @@ class GuardianController(BaseController[Guardian, GuardianUpdate]):
 
         self.twilio_service.send_verification_message(
             phone_number=phone_number,
-            message=f"Welcome!, {auth_user_name} has added you as their guardian to Capstone App. Your verification code is: {code}.",
+            message=f"Welcome! {auth_user_name} has added you as their guardian to Capstone App. Your verification code is: {code}.",
         )
 
         return self.crud_verification_code.create(

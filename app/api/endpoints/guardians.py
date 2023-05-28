@@ -116,6 +116,8 @@ def verify_guardian(
     Verifies if the guardian is a proper guardian of the student
     """
 
-    guardian = guardian_controller.verify_guardian(guardian_uuid)
+    guardian = guardian_controller.verify_guardian(
+        guardian_uuid=guardian_uuid, code=code
+    )
 
     return guardian
