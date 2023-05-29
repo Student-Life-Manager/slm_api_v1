@@ -132,3 +132,12 @@ def verify_guardian(
     )
 
     return guardian
+
+# @router.get("/unverified/all")
+# def get_all_unverified_guardians(request: Request):
+#     """
+#     Returns a list of all unverified guardians
+#     """
+
+
+
