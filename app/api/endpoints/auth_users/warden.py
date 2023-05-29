@@ -14,8 +14,6 @@ router = APIRouter(prefix="/wardens")
 
 
 @router.post("/register", response_model=AuthUserRegisterReturn)
-@auth_required
-@admin_required
 def create_new_warden(
     request: Request,
     auth_user_create: AuthUserCreate,
